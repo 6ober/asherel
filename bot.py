@@ -1,11 +1,23 @@
-import config
 import telebot
 
-bot = telebot.TeleBot(config.token)
+API_TOKEN = '1005817495:AAH1JlVfSCb3M4C6GcrLvZl_VvDWTcK3Evc'
 
-@bot.message_handler(content_types=["text"])
-def repeat_all_messages(message): # Название функции не играет никакой роли, в принципе
-    bot.send_message(message.chat.id, message.text)
+bot = telebot.TeleBot(API_TOKEN)
 
-if __name__ == '__main__':
-     bot.infinity_polling()
+
+# Handle '/start' and '/help'
+@bot.message_handler(commands=['help', 'start'])
+def send_welcome(message):
+    bot.reply_to(message, """\
+Hi there, I am EchoBot.
+I am here to echo your kind words back to you. Just say anything nice and I'll say the exact same thing to you!\
+""")
+
+
+# Handle all other messages with content_type 'text' (content_types defaults to ['text'])
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
+    bot.reply_to(message, message.text)
+
+
+bot.polling()
