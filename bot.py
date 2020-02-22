@@ -1,14 +1,31 @@
-import telebot;
-from telebot import types
+import requests  
+import datetime
 
-bot = telebot.TeleBot('1005817495:AAH1JlVfSCb3M4C6GcrLvZl_VvDWTcK3Evc');
-@bot.message_handler(content_types=['text'])
-def get_text_messages(message):
-if message.text == "Привет":
-    bot.send_message(message.from_user.id, "Привет, чем я могу тебе помочь?")
-elif message.text == "/help":
-    bot.send_message(message.from_user.id, "Напиши привет")
-else:
-    bot.send_message(message.from_user.id, "Я тебя не понимаю. Напиши /help.")
+class BotHandler:
 
-bot.polling(none_stop=True, interval=0)
+    def __init__(self, token):
+        self.token = 1005817495:AAH1JlVfSCb3M4C6GcrLvZl_VvDWTcK3Evc
+        self.api_url = "https://api.telegram.org/bot{}/".format(token)
+
+    def get_updates(self, offset=None, timeout=30):
+        method = 'getUpdates'
+        params = {'timeout': timeout, 'offset': offset}
+        resp = requests.get(self.api_url + method, params)
+        result_json = resp.json()['result']
+        return result_json
+
+    def send_message(self, chat_id, text):
+        params = {'chat_id': chat_id, 'text': text}
+        method = 'sendMessage'
+        resp = requests.post(self.api_url + method, params)
+        return resp
+
+    def get_last_update(self):
+        get_result = self.get_updates()
+
+        if len(get_result) > 0:
+            last_update = get_result[-1]
+        else:
+            last_update = get_result[len(get_result)]
+
+        return last_update
